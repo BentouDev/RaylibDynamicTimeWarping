@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+<Type Name="DataMatrixView&lt;*&gt;">
+  <DisplayString>extent = {y_size}, {x_size}</DisplayString>
+  <Expand>
+
+    <ArrayItems Condition="data != nullptr">
+      <Direction>Forward</Direction>
+      <Rank>2</Rank>
+      <Size>$i == 1 ? x_size : y_size</Size>
+      <ValuePointer>($T1*) data</ValuePointer>
+
+    </ArrayItems>
+  </Expand>
+</Type>
+
+</AutoVisualizer>
+
