@@ -18,11 +18,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files\app</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="app_types.natvis" />
+    <Natvis Include="src\app_types.natvis">
+      <Filter>Source Files</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

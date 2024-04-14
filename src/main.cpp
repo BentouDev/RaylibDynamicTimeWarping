@@ -239,7 +239,7 @@ void AdjustPath(Rectangle rect, std::span<Vector2> path)
     }
 
     const int PADDING = 5;
-    Vector2 dim{ point_max.x - point_min.x, point_max.y - point_min.y };
+    const Vector2 dim{ point_max.x - point_min.x, point_max.y - point_min.y };
 
     for (Vector2& point : path)
     {
@@ -271,7 +271,7 @@ int FindNearestPoint(std::span<Vector2> path, Vector2 pos, float* out_distance =
 
     for (uint i = 0; i < path.size(); i++)
     {
-        float dist = Vector2Distance(path[i], pos);
+        const float dist = Vector2Distance(path[i], pos);
         if (dist < min_dst)
         {
             min_dst = dist;
@@ -359,8 +359,8 @@ int RankPathScore(std::vector<Path>& paths)
 // Window size [0.0f, 1.0f]
 bool IsInWindow(int i, int j, int i_dim, int j_dim, float window)
 {
-    float i_span = i / float(i_dim);
-    float j_span = j / float(j_dim);
+    const float i_span = i / float(i_dim);
+    const float j_span = j / float(j_dim);
 
     return fabsf(i_span - j_span) < window;
 }
@@ -403,9 +403,9 @@ float CalcPathScoreDTW(std::span<Vector2> first, std::span<Vector2> second, floa
         {
             if (is_in_window(i, j))
             {
-                float cost = distance(i, j);
+                const float cost = distance(i, j);
 
-                float min_acc = std::min({
+                const float min_acc = std::min({
                     dtw[j][i - 1], // insertion
                     dtw[j - 1][i], // deletion
                     dtw[j - 1][i - 1]  // match
@@ -535,7 +535,7 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
                 }
                 else if (IsMouseButtonDown(0))
                 {
-                    for (uint i : ctx.selected_points)
+                    for (const uint i : ctx.selected_points)
                     {
                         if (Vector2Distance(path.points[i], ctx.mouse_pos) < PATH_POINT_INTERACT_RADIUS)
                         {
@@ -554,7 +554,7 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
             if (IsMouseButtonDown(0) && GetTime() - ctx.last_press_time > HOLD_TIME)
             {
                 // Handle select and move single point
-                if (int hover_point_idx = find_hover_point(); hover_point_idx != -1)
+                if (const int hover_point_idx = find_hover_point(); hover_point_idx != -1)
                 {
                     if (IndexOf<uint>(ctx.selected_points, hover_point_idx) == -1)
                     {
@@ -575,13 +575,13 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
                 // Insert new point on double click
                 if (ctx.click_count > 1)
                 {
-                    int idx = FindNearestPoint(path.points, ctx.mouse_pos);
+                    const int idx = FindNearestPoint(path.points, ctx.mouse_pos);
 
                     // last point
                     if (idx == path.points.size() - 1)
                     {
-                        Vector2 dir_to_next = Vector2Subtract(path.points[idx - 1], path.points[idx]);
-                        Vector2 dir_to_new = Vector2Subtract(ctx.mouse_pos, path.points[idx]);
+                        const Vector2 dir_to_next = Vector2Subtract(path.points[idx - 1], path.points[idx]);
+                        const Vector2 dir_to_new = Vector2Subtract(ctx.mouse_pos, path.points[idx]);
 
                         if (Vector2DotProduct(dir_to_next, dir_to_new) < 0)
                         {
@@ -596,8 +596,8 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
                     }
                     else
                     {
-                        Vector2 dir_to_next = Vector2Subtract(path.points[idx + 1], path.points[idx]);
-                        Vector2 dir_to_new = Vector2Subtract(ctx.mouse_pos, path.points[idx]);
+                        const Vector2 dir_to_next = Vector2Subtract(path.points[idx + 1], path.points[idx]);
+                        const Vector2 dir_to_new = Vector2Subtract(ctx.mouse_pos, path.points[idx]);
 
                         if (Vector2DotProduct(dir_to_next, dir_to_new) > 0)
                         {
@@ -613,7 +613,7 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
                 }
                 else
                 {
-                    if (int hover_point_idx = find_hover_point(); hover_point_idx != -1)
+                    if (const int hover_point_idx = find_hover_point(); hover_point_idx != -1)
                     {
                         if (IndexOf<uint>(ctx.selected_points, hover_point_idx) == -1)
                         {
@@ -630,9 +630,9 @@ void HandleEditPathViewport(EditPathCtx& ctx, Path& path)
         }
         case EditPathState::Move:
         {
-            Vector2 mouse_delta = Vector2Subtract(ctx.mouse_pos, ctx.move_mouse_pos);
+            const Vector2 mouse_delta = Vector2Subtract(ctx.mouse_pos, ctx.move_mouse_pos);
 
-            for (uint i : ctx.selected_points)
+            for (const uint i : ctx.selected_points)
             {
                 path.points[i] = Vector2Add(path.points[i], mouse_delta);
             }
@@ -718,11 +718,6 @@ void DrawEditPathViewport(EditPathCtx& ctx, std::span<Vector2> path, Color color
     // Mouse label
     switch (ctx.state)
     {
-    //case EditPathState::Pick:
-    //{
-    //    DrawText("Pick", ctx.mouse_pos.x, ctx.mouse_pos.y, 5, DARKGRAY);
-    //    break;
-    //}
     case EditPathState::Move:
     {
         DrawText("Move", ctx.mouse_pos.x + MOUSE_LABEL_PADDING, ctx.mouse_pos.y + MOUSE_LABEL_PADDING, 5, DARKBLUE);
@@ -814,7 +809,7 @@ bool GuiEditPathToolbar(Vector2 start_pos, const char* label, std::vector<Path>&
 
         if (paths[i].score == FLT_MAX)
         {
-            int txt_width = GetTextWidth("INF");
+            const int txt_width = GetTextWidth("INF");
 
             DrawText
             (
@@ -826,7 +821,7 @@ bool GuiEditPathToolbar(Vector2 start_pos, const char* label, std::vector<Path>&
         }
         else if (paths[i].score != 0.0f)
         {
-            std::string label = std::format("{}", paths[i].score_rank);
+            const std::string label = std::format("{}", paths[i].score_rank);
             const int txt_width = GetTextWidth(label.c_str());
 
             DrawText
@@ -846,15 +841,15 @@ bool GuiEditPathToolbar(Vector2 start_pos, const char* label, std::vector<Path>&
 
 void DrawMatrix(Rectangle rect, DataMatrixView<float> matrix, float min_val, float max_val, Color val_color, float window)
 {
-    Vector2 begin_pos = { rect.x, rect.y };
+    const Vector2 begin_pos = { rect.x, rect.y };
 
-    int x_cell_size = rect.width / matrix.x_size;
-    int y_cell_size = rect.height / matrix.y_size;
+    const int x_cell_size = rect.width / matrix.x_size;
+    const int y_cell_size = rect.height / matrix.y_size;
 
-    float val_range = max_val - min_val;
+    const float val_range = max_val - min_val;
 
-    int y_text_pad = y_cell_size / 3;
-    int x_text_pad = 5;
+    const int y_text_pad = y_cell_size / 3;
+    const int x_text_pad = 5;
 
     for (uint i = 0; i < matrix.x_size; i++)
     {
@@ -866,9 +861,9 @@ void DrawMatrix(Rectangle rect, DataMatrixView<float> matrix, float min_val, flo
             pos.x += i * x_cell_size;
             pos.y += j * y_cell_size;
 
-            bool in_window = IsInWindow(i, j, matrix.x_size, matrix.y_size, window);
+            const bool in_window = IsInWindow(i, j, matrix.x_size, matrix.y_size, window);
 
-            Rectangle rec = { pos.x, pos.y, x_cell_size, y_cell_size };
+            const Rectangle rec = { pos.x, pos.y, float(x_cell_size), float(y_cell_size) };
 
             if (matrix[j][i] == FLT_MAX)
             {
@@ -957,7 +952,7 @@ int main()
         // --
         // Update path edit tool
 
-        Vector2 mouse_pos = GetMousePosition();
+        const Vector2 mouse_pos = GetMousePosition();
         edit_tool.mouse_pos = mouse_pos;
 
         if (current_edit_anim_path != -1)
@@ -1043,14 +1038,14 @@ int main()
             // Gui to set DTW window size and enable debug matrix rendering
 
             const Vector2 WINDOW_SLIDER_SIZE = { 100, 20 };
-            Rectangle dtw_window_slider_rect =
+            const Rectangle dtw_window_slider_rect =
             {
                 (screenWidth / 2) - (WINDOW_SLIDER_SIZE.x / 2), screenHeight * 0.85f,
                 WINDOW_SLIDER_SIZE.x, WINDOW_SLIDER_SIZE.y
             };
 
             const Vector2 DTW_CHECK_SIZE = { 20, 20 };
-            Rectangle dtw_debug_checkbox_rect =
+            const Rectangle dtw_debug_checkbox_rect =
             { 
                 dtw_window_slider_rect.x, dtw_window_slider_rect.y + 10 + WINDOW_SLIDER_SIZE.y,
                 DTW_CHECK_SIZE.x, DTW_CHECK_SIZE.y
@@ -1085,7 +1080,7 @@ int main()
             }
 
             // Rank paths
-            int best_path_idx = RankPathScore(anim_paths);
+            const int best_path_idx = RankPathScore(anim_paths);
 
             // Draw debug matrix if applicable
             const int MATRIX_VIEW_SIZE_X = 300;
@@ -1094,7 +1089,7 @@ int main()
             if (show_matrix && (current_edit_anim_path != -1 || best_path_idx != -1))
             {
                 // Pick either currently edited anim path, or the best one when authoring track path
-                int path_idx = current_edit_anim_path != -1 ? current_edit_anim_path : best_path_idx;
+                const int path_idx = current_edit_anim_path != -1 ? current_edit_anim_path : best_path_idx;
 
                 DrawMatrix
                 (
@@ -1113,5 +1108,5 @@ int main()
     // Clean-up
     CloseWindow();
 
-	return 0;
+    return 0;
 }
