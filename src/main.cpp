@@ -397,21 +397,36 @@ float CalcPathScoreDTW(std::span<Vector2> first, std::span<Vector2> second, floa
     }
 
     // Compute
-    for (int i = 1; i < first_count; i++)
+    for (int i = 0; i < first_count; i++)
     {
-        for (int j = 1; j < second_count; j++)
+        for (int j = 0; j < second_count; j++)
         {
             if (is_in_window(i, j))
             {
                 const float cost = distance(i, j);
 
-                const float min_acc = std::min({
-                    dtw[j][i - 1], // insertion
-                    dtw[j - 1][i], // deletion
-                    dtw[j - 1][i - 1]  // match
-                });
+                if (i >= 1 && j >= 1)
+                {
+                    const float min_acc = std::min({
+                        dtw[j][i - 1], // insertion
+                        dtw[j - 1][i], // deletion
+                        dtw[j - 1][i - 1]  // match
+                    });
 
-                dtw[j][i] = cost + min_acc;
+                    dtw[j][i] = cost + min_acc;
+                }
+                else if (j >= 1)
+                {
+                    dtw[j][i] = cost + dtw[j - 1][i]; // deletion
+                }
+                else if (i >= 1)
+                {
+                    dtw[j][i] = cost + dtw[j][i - 1]; // insertion
+                }
+                else
+                {
+                    dtw[j][i] = cost;
+                }
             }
         }
     }
